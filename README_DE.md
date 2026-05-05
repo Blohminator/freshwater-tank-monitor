@@ -73,6 +73,8 @@ pio run --target upload
 
 Alle Tank-Parameter sind über das Web-Interface unter `http://freshwater-tank.local` konfigurierbar — keine Code-Änderungen erforderlich.
 
+> 🔒 **Anmeldung erforderlich** — Benutzername: `admin` / Passwort: `thisisfine`
+
 | Parameter | Pfad | Standard | Beschreibung |
 |-----------|------|----------|--------------|
 | Tanklänge | `/Tank/Length_cm` | 100 cm | Tanklänge in cm |

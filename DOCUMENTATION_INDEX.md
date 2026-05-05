@@ -25,6 +25,8 @@ A complete overview of all project documentation.
 
 All runtime configuration is done via the web interface at `http://freshwater-tank.local`.
 
+> 🔒 **Login required** — Username: `admin` / Password: `thisisfine`
+
 | Path | Parameter | Default |
 |------|-----------|---------|
 | `/Tank/Length_cm` | Tank length in cm | 100 |
