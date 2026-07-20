@@ -32,8 +32,11 @@ All runtime configuration is done via the web interface at `http://freshwater-ta
 | `/Tank/Length_cm` | Tank length in cm | 100 |
 | `/Tank/Width_cm` | Tank width in cm | 50 |
 | `/Tank/Height_cm` | Tank height in cm | 110 |
-| `/Tank/Offset_cm` | Sensor offset in cm | 5 |
+| `/Tank/Dist_Empty_cm` | Sensor reading with empty tank (cm) | 115 |
+| `/Tank/Dist_Full_cm` | Sensor reading with full tank (cm) | 2 |
 | `/Tank/Alarm_pct` | Alarm threshold in % | 95 |
+
+**Calibration:** Read `Dist=` values from serial monitor (115200 baud) with empty and full tank, then enter both values above. No offset calculation needed.
 
 No recompilation needed — changes take effect immediately.
 
@@ -43,9 +46,9 @@ No recompilation needed — changes take effect immediately.
 
 | Path | Type | Unit | Update |
 |------|------|------|--------|
-| `tanks.freshWater.0.currentLevel` | float | ratio 0.0–1.0 | on change > 1%, max every 2s |
+| `tanks.freshWater.0.currentLevel` | float | ratio 0.0–1.0 | every valid measurement (~100 ms) |
 | `tanks.freshWater.0.capacity` | float | m³ | on startup + every 60s |
-| `tanks.freshWater.0.currentVolume` | float | m³ | on change > 1%, max every 2s |
+| `tanks.freshWater.0.currentVolume` | float | m³ | every valid measurement (~100 ms) |
 
 ---
 

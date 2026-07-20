@@ -65,16 +65,20 @@ Open the web interface at **`http://freshwater-tank.local`**
 
 Navigate to the config items and set your values:
 
-| Parameter | Path | Example |
-|-----------|------|---------|
-| Tank Length | `/Tank/Length_cm` | 100 |
-| Tank Width | `/Tank/Width_cm` | 50 |
-| Tank Height | `/Tank/Height_cm` | 110 |
-| Sensor Offset | `/Tank/Offset_cm` | 5 |
-| Alarm Threshold | `/Tank/Alarm_pct` | 95 |
+| Parameter | Path | How to get the value |
+|-----------|------|----------------------|
+| Tank Length | `/Tank/Length_cm` | Measure tank interior |
+| Tank Width | `/Tank/Width_cm` | Measure tank interior |
+| Tank Height | `/Tank/Height_cm` | Measure tank interior |
+| Sensor reading EMPTY | `/Tank/Dist_Empty_cm` | Read `Dist=` from serial monitor with empty tank |
+| Sensor reading FULL | `/Tank/Dist_Full_cm` | Read `Dist=` from serial monitor with full tank |
+| Alarm Threshold | `/Tank/Alarm_pct` | e.g. 95 |
 
-> 💡 **Sensor Offset** = distance from the sensor face to the top edge of the tank (in cm).
-> Measure this carefully — it directly affects all level calculations.
+> 💡 **Calibration tip:** Open the serial monitor at 115200 baud.
+> The output shows `Dist=XX cm` on every reading.
+> Note the value with an empty tank and again with a full tank — enter those two values above.
+> This two-point calibration works correctly even if the sensor is mounted above the tank
+> or if a channel between sensor and tank fills with water when the tank is full.
 
 Changes take effect immediately without restarting the device.
 

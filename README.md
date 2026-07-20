@@ -77,11 +77,25 @@ All tank parameters are configurable via the web interface at `http://freshwater
 
 | Parameter | Path | Default | Description |
 |-----------|------|---------|-------------|
-| Tank Length | `/Tank/Length_cm` | 100 cm | Tank length in cm |
-| Tank Width | `/Tank/Width_cm` | 50 cm | Tank width in cm |
-| Tank Height | `/Tank/Height_cm` | 110 cm | Tank height in cm |
-| Sensor Offset | `/Tank/Offset_cm` | 5 cm | Distance from sensor to tank top |
+| Tank Length | `/Tank/Length_cm` | 100 cm | Internal tank length in cm |
+| Tank Width | `/Tank/Width_cm` | 50 cm | Internal tank width in cm |
+| Tank Height | `/Tank/Height_cm` | 110 cm | Internal tank height in cm |
+| Sensor reading EMPTY | `/Tank/Dist_Empty_cm` | 115 cm | Distance sensor reads when tank is **empty** |
+| Sensor reading FULL | `/Tank/Dist_Full_cm` | 2 cm | Distance sensor reads when tank is **full** |
 | Alarm Threshold | `/Tank/Alarm_pct` | 95 % | Fill level that triggers the alarm |
+
+### Calibration
+
+This project uses a two-point calibration instead of a fixed offset. This correctly handles any sensor mounting height, including channels or pipes between the sensor and the tank that may fill with water when the tank is full.
+
+**How to calibrate:**
+1. With the tank **empty**, open the serial monitor (115200 baud) and read the `Dist=` value → enter as `Dist_Empty_cm`
+2. With the tank **full**, read the `Dist=` value again → enter as `Dist_Full_cm`
+
+The fill level is then calculated as:
+```
+ratio = (Dist_Empty - measured_dist) / (Dist_Empty - Dist_Full)
+```
 
 Changes take effect immediately without restarting the device.
 
@@ -95,7 +109,7 @@ The system publishes three values to SignalK:
 | `tanks.freshWater.0.capacity` | Tank capacity | m³ |
 | `tanks.freshWater.0.currentVolume` | Current volume | m³ |
 
-`currentLevel` and `currentVolume` are sent when the value changes by more than 1% and at most every 2 seconds.  
+`currentLevel` and `currentVolume` are sent on every valid measurement (~100 ms).  
 `capacity` is sent once after startup (5 s delay) and then every 60 seconds.
 
 ## Display Information
@@ -159,8 +173,8 @@ This reduces noise from surface ripples or sensor jitter. The displayed height a
 
 - **Measurement Range**: 0.3 m – 12 m (TFmini-S)
 - **Measurement Accuracy**: ±6 cm @ 6 m
-- **Update Rate**: 2 Hz (500 ms)
-- **SignalK Send Interval**: max. every 2 s, only on >1% change
+- **Update Rate**: 10 Hz (100 ms)
+- **SignalK Send Interval**: every valid measurement (~100 ms)
 - **Operating Voltage**: 5V (via USB or external power)
 - **WiFi**: 802.11 b/g/n (2.4 GHz)
 - **Display**: 128×64 pixels, monochrome
