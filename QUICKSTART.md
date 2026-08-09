@@ -61,7 +61,7 @@ pio run --target upload
 
 Open the web interface at **`http://freshwater-tank.local`**
 
-> 🔒 **Login required** — Username: `admin` / Password: `thisisfine`
+> 💡 No login required — the web interface opens directly in your browser.
 
 Navigate to the config items and set your values:
 

@@ -73,7 +73,7 @@ pio run --target upload
 
 All tank parameters are configurable via the web interface at `http://freshwater-tank.local` — no code changes required.
 
-> 🔒 **Login required** — Username: `admin` / Password: `thisisfine`
+> 💡 No login required — the web interface opens directly in your browser.
 
 | Parameter | Path | Default | Description |
 |-----------|------|---------|-------------|

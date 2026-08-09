@@ -25,7 +25,7 @@ A complete overview of all project documentation.
 
 All runtime configuration is done via the web interface at `http://freshwater-tank.local`.
 
-> 🔒 **Login required** — Username: `admin` / Password: `thisisfine`
+> � No login required — the web interface opens directly in your browser.
 
 | Path | Parameter | Default |
 |------|-----------|---------|

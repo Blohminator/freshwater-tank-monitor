@@ -124,7 +124,7 @@ Before diving into specific issues, run through this list:
 2. Use the IP address directly instead of the hostname (e.g. `http://192.168.1.42`)
 3. On Android, mDNS may not work — always use the IP address
 4. Make sure your phone/computer is on the **same WiFi network** as the ESP32
-5. When prompted, log in with Username: `admin` / Password: `thisisfine`
+5. The web interface requires no login — it opens directly in the browser
 
 ---
 
