@@ -50,15 +50,10 @@ const int     TFMINI_FRAME_SIZE = 9;     // Total bytes per frame
 float cfg_length     = 100.0f;  // Tank internal length (cm)
 float cfg_width      =  50.0f;  // Tank internal width (cm)
 float cfg_height     = 110.0f;  // Tank internal height (cm)
-float cfg_dist_empty = 115.0f;  // Sensor reading when tank is EMPTY (cm)
-float cfg_dist_full  =   2.0f;  // Sensor reading when tank is FULL (cm)
+float cfg_offset     =   5.0f;  // Distance from sensor face down to tank top edge (cm)
+                                 // When tank is FULL:  sensor reads ~cfg_offset
+                                 // When tank is EMPTY: sensor reads ~cfg_height + cfg_offset
 float cfg_alarm_high =  95.0f;  // Alarm ON threshold (% fill level)
-
-// cfg_dist_empty / cfg_dist_full calibration guide:
-//   1. Empty the tank completely → read "Dist=" from serial monitor → set cfg_dist_empty
-//   2. Fill the tank completely  → read "Dist=" from serial monitor → set cfg_dist_full
-//   This method handles any sensor mounting height and accounts for
-//   channels/pipes between sensor and tank that may fill with water.
 
 // ============================================================
 // TANK GEOMETRY HELPERS
@@ -194,16 +189,15 @@ class TFminiSensor : public Sensor<float> {
       return;
     }
 
-    // Linear interpolation between calibrated empty and full distances.
-    // cfg_dist_empty = sensor reading when tank is 0% full (large distance)
-    // cfg_dist_full  = sensor reading when tank is 100% full (small distance)
+    // Sensor is mounted cfg_offset cm above the tank top edge.
+    // When tank is FULL:  dist ≈ cfg_offset        → empty_air = 0  → fill = 100%
+    // When tank is EMPTY: dist ≈ cfg_offset + cfg_height → empty_air = cfg_height → fill = 0%
     //
-    // As the tank fills, dist decreases from cfg_dist_empty toward cfg_dist_full.
-    // This approach works regardless of sensor mounting height and handles
-    // channels between sensor and tank that may partially fill with water.
-    float span      = cfg_dist_empty - cfg_dist_full;  // total measurable range
-    float raw_ratio = constrain((cfg_dist_empty - (float)dist) / span, 0.0f, 1.0f);
-    float fill_h    = raw_ratio * cfg_height;
+    // empty_air = air gap inside the tank (from tank top down to water surface)
+    // fill_h    = water height from tank bottom up
+    float empty_air = constrain((float)dist - cfg_offset, 0.0f, cfg_height);
+    float fill_h    = cfg_height - empty_air;
+    float raw_ratio = constrain(fill_h / cfg_height, 0.0f, 1.0f);
 
     // Seed the EMA filter on first valid reading to avoid slow convergence
     if (filtered_ratio < 0.0f) {
@@ -302,25 +296,18 @@ void setup() {
     ->set_sort_order(300);
   sens_height->connect_to(new LambdaConsumer<float>([](float v){ cfg_height = v; }));
 
-  auto* sens_dist_empty = new ConstantSensor<float>(cfg_dist_empty, 0, "/Tank/Dist_Empty_cm");
-  ConfigItem(sens_dist_empty)
-    ->set_title("Sensor reading EMPTY tank (cm)")
-    ->set_description("Distance the sensor measures when the tank is completely empty. Read from serial monitor: Dist=XX")
+  auto* sens_offset = new ConstantSensor<float>(cfg_offset, 0, "/Tank/Offset_cm");
+  ConfigItem(sens_offset)
+    ->set_title("Sensor Offset (cm)")
+    ->set_description("Distance from sensor face down to the tank top edge (cm). Full tank: sensor reads ~offset. Empty tank: sensor reads ~height + offset.")
     ->set_sort_order(400);
-  sens_dist_empty->connect_to(new LambdaConsumer<float>([](float v){ cfg_dist_empty = v; }));
-
-  auto* sens_dist_full = new ConstantSensor<float>(cfg_dist_full, 0, "/Tank/Dist_Full_cm");
-  ConfigItem(sens_dist_full)
-    ->set_title("Sensor reading FULL tank (cm)")
-    ->set_description("Distance the sensor measures when the tank is completely full. Read from serial monitor: Dist=XX")
-    ->set_sort_order(500);
-  sens_dist_full->connect_to(new LambdaConsumer<float>([](float v){ cfg_dist_full = v; }));
+  sens_offset->connect_to(new LambdaConsumer<float>([](float v){ cfg_offset = v; }));
 
   auto* sens_alarm = new ConstantSensor<float>(cfg_alarm_high, 0, "/Tank/Alarm_pct");
   ConfigItem(sens_alarm)
     ->set_title("Alarm threshold % (default: 95)")
     ->set_description("Fill level % at which the alarm output is activated")
-    ->set_sort_order(600);
+    ->set_sort_order(500);
   sens_alarm->connect_to(new LambdaConsumer<float>([](float v){ cfg_alarm_high = v; }));
 
   // ============================================================

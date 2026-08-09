@@ -87,15 +87,15 @@ Before diving into specific issues, run through this list:
 
 ### Readings seem offset (level always too high or too low)
 **Possible causes:**
-- Calibration values not set correctly
+- Sensor offset not configured correctly
 - Tank height not set correctly
 
 **Fix:**
-1. Open serial monitor at 115200 baud — you will see `Dist=XX cm` on every reading
-2. With the tank **empty**, note the `Dist=` value → enter as `Dist_Empty_cm` in the web interface
-3. With the tank **full**, note the `Dist=` value → enter as `Dist_Full_cm` in the web interface
-4. The system uses linear interpolation between these two points — no offset calculation needed
-5. If the tank has a channel or pipe between sensor and tank that fills with water, this calibration method handles it automatically
+1. Measure the exact distance from the **sensor face** down to the **top edge of the tank** → enter as `Sensor Offset` (`/Tank/Offset_cm`)
+2. Verify `Tank Height` matches the **internal** height of the tank
+3. With an empty tank, serial monitor should show: `Dist ≈ cfg_height + cfg_offset`
+4. With a full tank, serial monitor should show: `Dist ≈ cfg_offset`
+5. If the channel between sensor and tank fills with water when full, `Dist` may be less than `cfg_offset` — this is handled correctly and will show 100%
 
 ---
 

@@ -80,22 +80,26 @@ All tank parameters are configurable via the web interface at `http://freshwater
 | Tank Length | `/Tank/Length_cm` | 100 cm | Internal tank length in cm |
 | Tank Width | `/Tank/Width_cm` | 50 cm | Internal tank width in cm |
 | Tank Height | `/Tank/Height_cm` | 110 cm | Internal tank height in cm |
-| Sensor reading EMPTY | `/Tank/Dist_Empty_cm` | 115 cm | Distance sensor reads when tank is **empty** |
-| Sensor reading FULL | `/Tank/Dist_Full_cm` | 2 cm | Distance sensor reads when tank is **full** |
+| Sensor Offset | `/Tank/Offset_cm` | 5 cm | Distance from sensor face down to tank top edge |
 | Alarm Threshold | `/Tank/Alarm_pct` | 95 % | Fill level that triggers the alarm |
 
-### Calibration
+### How offset and height work together
 
-This project uses a two-point calibration instead of a fixed offset. This correctly handles any sensor mounting height, including channels or pipes between the sensor and the tank that may fill with water when the tank is full.
-
-**How to calibrate:**
-1. With the tank **empty**, open the serial monitor (115200 baud) and read the `Dist=` value → enter as `Dist_Empty_cm`
-2. With the tank **full**, read the `Dist=` value again → enter as `Dist_Full_cm`
-
-The fill level is then calculated as:
 ```
-ratio = (Dist_Empty - measured_dist) / (Dist_Empty - Dist_Full)
+Sensor face
+    │
+    │  cfg_offset  (e.g. 5 cm)
+    │
+Tank top edge ──────────────────
+    │
+    │  cfg_height  (e.g. 110 cm)   ← air gap when empty, water when full
+    │
+Tank bottom ─────────────────────
 ```
+
+- **Tank full:** sensor reads ≈ `cfg_offset` (water surface is at tank top)
+- **Tank empty:** sensor reads ≈ `cfg_offset + cfg_height`
+- If the channel between sensor and tank fills with water when the tank is full, `dist` may be less than `cfg_offset` — this is handled correctly by the `constrain()` in the code and will show 100%.
 
 Changes take effect immediately without restarting the device.
 
